@@ -324,7 +324,7 @@ server <- function(input, output) {
 
 
 
-    #setwd("C:/Users/james/OneDrive/Documents/Important_Files/Stat_ed_2018_papers/paper_0_bball_data/0_basketball_data")
+    setwd("C:/Users/james/OneDrive/Documents/Important_Files/Stat_ed_2018_papers/paper_0_bball_data/plots_for_shots")
     nba = read.csv('modern_nba_legends.csv')
 
     nba = nba %>%
