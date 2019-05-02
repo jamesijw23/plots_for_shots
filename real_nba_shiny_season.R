@@ -56,9 +56,7 @@ change_name = function(x){
     return("LeBron James")
   } else if(x == "MJ"){
     return("Michael Jordan")
-  } else if(x == "SC"){
-    return("Steph Curry")
-  }
+  } 
 }
 
 
@@ -193,15 +191,16 @@ ui <- fluidPage(
         selectInput("player_name", "Player of Interest:",
                     choices = list("LeBron James" = 1,
                                    "Michael Jordan" = 2,
-                                   "Steph Curry" = 3,
-                                   "Kobe Byrant" = 4), selected = 1),
+                                   "Kobe Byrant" = 3), selected = 1),
 
 
         ##~~~~~~~~~~~~~~~~~~~~~~
         ## A.2) Number of Variables
         ##~~~~~~~~~~~~~~~~~~~~~~
         selectInput("number_variables", "How many variables:",
-                    choices = list("One Variable" = 1, "Two Variables" = 2), selected = "One Variable"),
+                    choices = list("One Variable" = 1, 
+                                   "Two Variables" = 2),
+                    selected = "One Variable"),
 
 
 
@@ -359,9 +358,9 @@ server <- function(input, output) {
       imp_player_name = 'Michael Jordan'
       imp_color_plots = 'rgb(206,17,65)'
     }else if(input$player_name == 3){
-      imp_player = 'SC'
-      imp_player_name = 'Steph Curry'
-      imp_color_plots = 'rgb(0,107,182)'
+      imp_player = 'KB'
+      imp_player_name = 'Kobe Byrant'
+      imp_color_plots = 'rgb(85,37,130)'
     } else if(input$player_name == 4){
       imp_player = 'KB'
       imp_player_name = 'Kobe Byrant'
