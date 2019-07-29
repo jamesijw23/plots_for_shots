@@ -310,7 +310,23 @@ ui <- fluidPage(
     mainPanel(
       plotlyOutput("plot"),
       verbatimTextOutput("event"),
-      tableOutput("text2"))
+      textOutput("text1"),
+      tags$head(tags$style("#text1{color: red;
+                                 font-size: 20px;
+                                 font-family: 'Old Standard TT, serif';
+                                 }"
+      ))
+      
+    )
+    
+    
+    
+    
+    
+    
+    
+    
+    
   )
 )
 
@@ -333,7 +349,7 @@ server <- function(input, output) {
     
     
     setwd("C:/Users/james/OneDrive/Documents/Important_Files/Stat_ed_2018_papers/paper_0_bball_data/0_basketball_data")
-    nba = read.csv('modern_nba_legends_5292019.csv',stringsAsFactors = F)
+    nba = read.csv('modern_nba_legends_5292019.csv')
     
     nba = nba %>%
       filter(Name != "SC") %>%
@@ -350,7 +366,13 @@ server <- function(input, output) {
     
     
     
-
+    ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Font Type
+    f <- list(
+      family = "Courier New",
+      size = 18,
+      color = "#7f7f7f"
+    )
     
     ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## Font Type for x and y title
@@ -372,7 +394,7 @@ server <- function(input, output) {
     ## Font Type for title
     f_title <- list(
       family = "Old Standard TT, serif",
-      size = 20,
+      size = 23,
       color = "black"
     )
     
@@ -416,7 +438,7 @@ server <- function(input, output) {
         ##-----------------------------------------------------------
         
         
-    
+        
         ##-----------------------------------------------------------
         ## Heatmap 0: Data Curation for Heatmap
         ##-----------------------------------------------------------
@@ -507,7 +529,7 @@ server <- function(input, output) {
         
         
         ## Plot Graphic  
-       
+        
         p <- plot_ly(x=colnames(data_nba),
                      y=rownames(data_nba),
                      z = data_nba,
@@ -529,108 +551,7 @@ server <- function(input, output) {
         
         
         
-      } else if (input$graph_represent == 2)
-      {  ## Barplot
-        ##-----------------------------------------------------------
-        ## Bar Plot 0: Data Curation for Bar Plot
-        ##-----------------------------------------------------------
-        ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ## x and y for Bar Plot Multiplayer
-        x_barplot_mp_off <- list(
-          title = "Offensive Variables",
-          titlefont = f,
-          tickfont = f
-        )
-        x_barplot_mp_def <- list(
-          title = "Defensive Variables",
-          titlefont = f,
-          tickfont = f
-        )
-        
-        y_barplot_mp <- list(
-          title = "Z-Score",
-          titlefont = f,
-          tickfont = f
-        )
-        ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ## Group by Name and find means
-        ## Find Means
-        summarize_data_nba = nba_data %>%
-          group_by(Name) %>%
-          summarise_all(funs(mean))
-        ## Make NA 0
-        summarize_data_nba[is.na(summarize_data_nba)] = 0
-        ## Get names for new matrix
-        names_players = as.character(summarize_data_nba$Name)
-        
-        ## Make data matrix
-        summarize_data_nba = summarize_data_nba %>%
-          select(-Name) %>%
-          as.matrix()
-        
-        
-        summarize_data_nba_scaled = apply(summarize_data_nba,2,scale)
-        data_nba_t = t(summarize_data_nba_scaled)
-        colnames(data_nba_t) = names_players
-        data_nba_t = data.frame(data_nba_t)
-        data_nba_t = rownames_to_column(data_nba_t, "stats")
-        ## Subset to defensive Stats
-        def_stats = c("DRB","BLK","STL")
-        data_nba_t_def = data_nba_t %>%
-          filter(stats %in% def_stats)
-        ## Subset to Offensive Stats
-        off_stats = c("PTS","ORB","AST","TOV")
-        data_nba_t_off = data_nba_t %>%
-          filter(stats %in% off_stats)
-        
-        data_nba_t_off$Stats = apply(as.matrix(data_nba_t_off$stats),1,change_statistic)
-        
-        rownames(data_nba_t_off) = apply(as.matrix(rownames(data_nba_t_off)),1,change_name)
-        
-        
-        
-        data_nba_t_def$Stats = apply(as.matrix(data_nba_t_def$stats),1,change_statistic)
-        
-        rownames(data_nba_t_def) = apply(as.matrix(rownames(data_nba_t_def)),1,change_name)
-        
-        
-        
-        
-        ##-----------------------------------------------------------
-        ## Bar Plot 1: Plot for Bar Plot Offensive
-        ##-----------------------------------------------------------
-        if(input$barplot_type == 1){
-          p <- plot_ly(data_nba_t_off, x = ~stats, y = ~KB,
-                       type = 'bar', name = 'KB',
-                       marker = list(color = 'rgb(85,37,130)')) %>%
-            add_trace(y = ~LJ, name = 'LJ',
-                      marker = list(color = 'rgb(255,184,28)')) %>%
-            add_trace(y = ~MJ, name = 'MJ',
-                      marker = list(color = 'rgb(206,17,65)')) %>%
-            layout(yaxis = y_barplot_mp,
-                   xaxis = x_barplot_mp_off,
-                   title = "Offensive Statistics Z-scores",
-                   barmode = 'group')
-          
-          p
-        } else if(input$barplot_type == 2)
-          ##-----------------------------------------------------------
-        ## Bar Plot 2: Plot for Bar Plot Defensive
-        ##-----------------------------------------------------------
-        p <- plot_ly(data_nba_t_def, x = ~stats, y = ~KB,
-                     type = 'bar', name = 'KB',
-                     marker = list(color = 'rgb(85,37,130)')) %>%
-          add_trace(y = ~LJ, name = 'LJ',
-                    marker = list(color = 'rgb(255,184,28)')) %>%
-          add_trace(y = ~MJ, name = 'MJ',
-                    marker = list(color = 'rgb(206,17,65)')) %>%
-          layout(yaxis = y_barplot_mp,
-                 xaxis = x_barplot_mp_def,
-                 title = "Defensive Statistics Z-scores",
-                 barmode = 'group')
-        p
-      } else
-      { ## Boxplot
+      }  else { ## Boxplot
         ##-----------------------------------------------------------
         ## Boxplot 0: Curate data for boxplot
         ##-----------------------------------------------------------
@@ -640,8 +561,8 @@ server <- function(input, output) {
         ## Determine Important Statistic
         imp_stat = var_type_find(input$boxplot_type)
         
-  
-        ##**
+        
+        ##
         ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         ## x and y for Boxplots Multiplayer
         y_boxplot_mp <- list(
@@ -655,8 +576,8 @@ server <- function(input, output) {
           tickfont = f_xy_tick
         )
         
-     
-
+        
+        
         
         
         
@@ -670,13 +591,13 @@ server <- function(input, output) {
         ##-----------------------------------------------------------
         ## Boxplot 1:  Plot Boxplot
         ##-----------------------------------------------------------
-        p <- plot_ly( y = ~info$KB,type = "box", name = 'KB',
+        p <- plot_ly( y = ~info$KB,type = "box", name = 'Bryant',
                       marker = list(color ='rgb(85,37,130)'),
                       line = list(color = 'rgb(85,37,130)') ) %>%
-          add_trace(y = ~info$LJ, name = 'LJ',
+          add_trace(y = ~info$LJ, name = 'James',
                     marker = list(color = 'rgb(255,184,28)'),
                     line = list(color = 'rgb(255,184,28)') ) %>%
-          add_trace(y = ~info$MJ, name = 'MJ',
+          add_trace(y = ~info$MJ, name = 'Jordan',
                     marker = list(color = 'rgb(206,17,65)'),
                     line = list(color = 'rgb(206,17,65)') ) %>%
           layout(yaxis = y_boxplot_mp ,
@@ -702,10 +623,6 @@ server <- function(input, output) {
           
           ## Determine Important Statistic
           imp_stat = var_type_find(input$single_player_1stat)
-          
-          
-          
-          
           
           
           
@@ -878,7 +795,7 @@ server <- function(input, output) {
             titlefont = f_xy_title,
             tickfont = f_xy_tick
           )
-          title_timeseries_sp <- paste("Season ",input$Season," of ",imp_player_name," ",
+          title_timeseries_sp <- paste("Season ",input$Season," of ",change_name(imp_player_name)," ",
                                        change_statistic(imp_stat), " Time Series",sep ='')
           ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           player_timeseries = nba %>%
@@ -891,7 +808,7 @@ server <- function(input, output) {
           ## Time Series 1: Show Time Series
           ##-----------------------------------------------------------
           p <- plot_ly(x = ~as.Date(as.character(player_timeseries$Date),
-                                    format = '%Y-%m-%d'),
+                                    format = '%m/%d/%Y'),
                        y = ~imp_stat_data[,1],
                        type = 'scatter',
                        mode = 'lines',
@@ -935,19 +852,25 @@ server <- function(input, output) {
     
     
   })
+  
   output$event <- renderPrint({
     d <- event_data("plotly_hover")
     if (is.null(d)) "Hover on a point!" else d
   })
   
-  output$text2 <- renderPrint({
-    
-    if(input$type_analysis == 1 ){
-      cat("Note: MJ - Michael Jordan, LJ - LeBron James, KB - Kobe Byrant")
-    }
-    
-  })
+  # output$text2 <- renderText({
+  # 
+  #   #if(input$type_analysis == 1 ){
+  #     paste("Note: MJ - Michael Jordan, LJ - LeBron James, KB - Kobe Byrant")
+  #   #}
+  # 
+  # })
   
+  output$text1 <- renderText({
+    if(input$type_analysis == 1 ){
+      paste("Note: MJ - Michael Jordan, LJ - LeBron James, KB - Kobe Byrant",input$n) 
+    }
+  })
   
 }
 
